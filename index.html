@@ -1,0 +1,791 @@
+
+<h2 class="sr-only">Project 27 daily check-in form with weekly review dashboard, habit tracking, spending log, and time audit.</h2>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+.app{padding:1.5rem 0.5rem;max-width:860px;margin:0 auto;font-family:var(--font-sans);}
+.hero{margin-bottom:1.25rem;padding-bottom:1rem;border-bottom:0.5px solid var(--color-border-tertiary);}
+.hero-eye{font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:5px;}
+.hero-title{font-family:var(--font-serif);font-size:26px;font-weight:400;color:var(--color-text-primary);margin-bottom:3px;}
+.hero-sub{font-size:13px;color:var(--color-text-secondary);}
+.nav{display:flex;gap:6px;margin-bottom:1.25rem;flex-wrap:wrap;}
+.ntab{font-size:12px;font-weight:500;padding:5px 13px;border-radius:99px;border:0.5px solid var(--color-border-tertiary);cursor:pointer;color:var(--color-text-secondary);background:transparent;transition:all 0.12s;}
+.ntab:hover{background:var(--color-background-secondary);}
+.ntab.on{background:var(--color-background-primary);border-color:var(--color-border-secondary);color:var(--color-text-primary);}
+.sec{display:none;}
+.sec.on{display:block;}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1.25rem;margin-bottom:1rem;}
+.ctitle{font-size:15px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px;}
+.csub{font-size:12px;color:var(--color-text-secondary);margin-bottom:14px;line-height:1.5;}
+.divider{border:none;border-top:0.5px solid var(--color-border-tertiary);margin:14px 0;}
+.slbl{font-size:11px;font-weight:500;letter-spacing:0.09em;text-transform:uppercase;color:var(--color-text-tertiary);margin-bottom:8px;}
+
+.q-block{margin-bottom:18px;}
+.q-label{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px;line-height:1.4;}
+.q-hint{font-size:12px;color:var(--color-text-tertiary);margin-bottom:8px;line-height:1.5;}
+
+.prayer-row{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px;margin-bottom:6px;}
+.pbox{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px 4px;text-align:center;cursor:pointer;transition:background 0.12s;}
+.pbox:hover{background:var(--color-background-secondary);}
+.pbox.done{background:#E1F5EE;border-color:#5DCAA5;}
+.pbox.done .pn{color:#085041;}
+.pbox.done .pc{color:#1D9E75;}
+.pn{font-size:11px;font-weight:500;color:var(--color-text-secondary);}
+.pc{font-size:14px;color:var(--color-text-tertiary);margin-top:2px;}
+
+.btn-row{display:flex;gap:7px;flex-wrap:wrap;}
+.hbtn{padding:6px 15px;border-radius:99px;border:0.5px solid var(--color-border-secondary);font-size:12px;font-weight:500;cursor:pointer;background:transparent;color:var(--color-text-secondary);transition:all 0.12s;font-family:var(--font-sans);}
+.hbtn:hover{background:var(--color-background-secondary);}
+.hbtn.sel-yes{background:#E1F5EE;border-color:#5DCAA5;color:#085041;}
+.hbtn.sel-no{background:#FCEBEB;border-color:#F09595;color:#791F1F;}
+.hbtn.sel-part{background:#FAEEDA;border-color:#FAC775;color:#412402;}
+
+.follow{display:none;margin-top:8px;}
+.follow.show{display:block;}
+.follow-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.flbl{font-size:11px;color:var(--color-text-tertiary);margin-bottom:3px;}
+.finput{width:100%;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 10px;font-size:13px;color:var(--color-text-primary);background:var(--color-background-secondary);font-family:var(--font-sans);}
+.finput::placeholder{color:var(--color-text-tertiary);}
+.fselect{width:100%;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:7px 10px;font-size:13px;color:var(--color-text-primary);background:var(--color-background-secondary);font-family:var(--font-sans);}
+.jarea{width:100%;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:8px 11px;font-size:13px;color:var(--color-text-primary);background:var(--color-background-secondary);resize:none;font-family:var(--font-sans);}
+.jarea::placeholder{color:var(--color-text-tertiary);}
+
+.feedback{font-size:12px;margin-top:6px;padding:7px 10px;border-radius:var(--border-radius-md);display:none;}
+.feedback.show{display:block;}
+.feedback.good{background:#E1F5EE;color:#085041;}
+.feedback.warn{background:#FAEEDA;color:#412402;}
+.feedback.bad{background:#FCEBEB;color:#791F1F;}
+
+.spend-row{display:flex;gap:8px;align-items:flex-end;margin-bottom:8px;}
+.spend-add-btn{padding:7px 14px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);font-size:12px;font-weight:500;cursor:pointer;background:transparent;color:var(--color-text-secondary);font-family:var(--font-sans);white-space:nowrap;}
+.spend-add-btn:hover{background:var(--color-background-secondary);}
+.spend-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+.spend-item{display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);font-size:13px;}
+.spend-item-left{color:var(--color-text-primary);}
+.spend-item-right{display:flex;align-items:center;gap:10px;}
+.spend-amt{font-weight:500;color:var(--color-text-primary);}
+.spend-cat{font-size:11px;color:var(--color-text-tertiary);}
+.spend-del{cursor:pointer;color:var(--color-text-tertiary);font-size:14px;line-height:1;}
+.spend-total{display:flex;justify-content:space-between;padding:8px 10px;border-top:0.5px solid var(--color-border-tertiary);margin-top:6px;font-size:13px;}
+.spend-total-lbl{color:var(--color-text-secondary);}
+.spend-total-val{font-weight:500;color:var(--color-text-primary);}
+
+.save-btn{width:100%;padding:10px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);font-size:13px;font-weight:500;cursor:pointer;background:var(--color-background-secondary);color:var(--color-text-primary);font-family:var(--font-sans);margin-top:4px;transition:background 0.12s;}
+.save-btn:hover{background:var(--color-background-primary);}
+.save-btn.saved{background:#E1F5EE;color:#085041;border-color:#5DCAA5;}
+
+/* Weekly review */
+.week-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.week-nav-btn{padding:5px 12px;border-radius:99px;border:0.5px solid var(--color-border-tertiary);font-size:12px;cursor:pointer;background:transparent;color:var(--color-text-secondary);font-family:var(--font-sans);}
+.week-nav-btn:hover{background:var(--color-background-secondary);}
+.week-title{font-size:14px;font-weight:500;color:var(--color-text-primary);}
+
+.review-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px;}
+.rv-card{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px;text-align:center;}
+.rv-num{font-size:22px;font-weight:500;color:var(--color-text-primary);}
+.rv-lbl{font-size:11px;color:var(--color-text-tertiary);margin-top:2px;}
+.rv-sub{font-size:11px;margin-top:2px;}
+
+.habit-review-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px;}
+.hr-item{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:10px 12px;}
+.hr-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.hr-name{font-size:13px;font-weight:500;color:var(--color-text-primary);}
+.hr-score{font-size:12px;font-weight:500;}
+.hr-bar-bg{background:var(--color-background-primary);border-radius:99px;height:5px;}
+.hr-bar-fill{height:5px;border-radius:99px;transition:width 0.4s;}
+.hr-insight{font-size:11px;color:var(--color-text-tertiary);margin-top:5px;line-height:1.4;}
+
+.spend-review{margin-bottom:14px;}
+.spend-day-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:13px;}
+.spend-day-row:last-child{border-bottom:none;}
+.spend-day-lbl{color:var(--color-text-secondary);}
+.spend-day-amt{font-weight:500;color:var(--color-text-primary);}
+.spend-day-cats{font-size:11px;color:var(--color-text-tertiary);}
+
+.wasted-time-chart{display:flex;flex-direction:column;gap:6px;margin-bottom:14px;}
+.wt-row{display:flex;align-items:center;gap:10px;}
+.wt-day{font-size:12px;color:var(--color-text-secondary);width:24px;flex-shrink:0;}
+.wt-bar-bg{flex:1;background:var(--color-background-secondary);border-radius:99px;height:8px;}
+.wt-bar-fill{height:8px;border-radius:99px;background:#E24B4A;}
+.wt-mins{font-size:11px;color:var(--color-text-tertiary);width:40px;text-align:right;flex-shrink:0;}
+
+.insight-box{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px 14px;margin-bottom:10px;}
+.insight-title{font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:4px;}
+.insight-text{font-size:12px;color:var(--color-text-secondary);line-height:1.6;}
+
+.countdown-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:1.25rem;}
+.cd{background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:12px;text-align:center;}
+.cd-n{font-size:20px;font-weight:500;color:var(--color-text-primary);}
+.cd-l{font-size:11px;color:var(--color-text-tertiary);margin-top:2px;}
+</style>
+
+<div class="app">
+  <div class="hero">
+    <div class="hero-eye">Personal operating system</div>
+    <div class="hero-title">Project 27</div>
+    <div class="hero-sub">13 months. Fill in daily. Review weekly. Improve monthly.</div>
+  </div>
+
+  <div class="countdown-row">
+    <div class="cd"><div class="cd-n" id="days-left">—</div><div class="cd-l">days remaining</div></div>
+    <div class="cd"><div class="cd-n" id="weeks-left">—</div><div class="cd-l">weeks remaining</div></div>
+    <div class="cd"><div class="cd-n" id="pct-done">—</div><div class="cd-l">% of journey done</div></div>
+  </div>
+
+  <div class="nav">
+    <div class="ntab on" onclick="show('checkin',this)">Daily check-in</div>
+    <div class="ntab" onclick="show('weekly',this)">Weekly review</div>
+    <div class="ntab" onclick="show('pillars',this)">Pillars</div>
+    <div class="ntab" onclick="show('evening',this)">Evening system</div>
+    <div class="ntab" onclick="show('books',this)">Book notes</div>
+    <div class="ntab" onclick="show('fuel',this)">Fuel</div>
+  </div>
+
+  <!-- DAILY CHECK-IN -->
+  <div id="sec-checkin" class="sec on">
+    <div class="card">
+      <div class="ctitle">Daily check-in — <span id="today-date" style="font-weight:400;font-size:13px;color:var(--color-text-secondary);"></span></div>
+      <div class="csub">Fill this in once a day. Takes 3 minutes. Everything feeds into your weekly review.</div>
+
+      <!-- PRAYERS -->
+      <div class="q-block">
+        <div class="q-label">How many prayers did you pray today?</div>
+        <div class="q-hint">Tap each one you prayed. Honesty only — this data is for you.</div>
+        <div class="prayer-row">
+          <div class="pbox" id="pr-fajr" onclick="toggleP('fajr')"><div class="pn">Fajr</div><div class="pc" id="pc-fajr">○</div></div>
+          <div class="pbox" id="pr-dhuhr" onclick="toggleP('dhuhr')"><div class="pn">Dhuhr</div><div class="pc" id="pc-dhuhr">○</div></div>
+          <div class="pbox" id="pr-asr" onclick="toggleP('asr')"><div class="pn">Asr</div><div class="pc" id="pc-asr">○</div></div>
+          <div class="pbox" id="pr-maghrib" onclick="toggleP('maghrib')"><div class="pn">Maghrib</div><div class="pc" id="pc-maghrib">○</div></div>
+          <div class="pbox" id="pr-isha" onclick="toggleP('isha')"><div class="pn">Isha</div><div class="pc" id="pc-isha">○</div></div>
+        </div>
+        <div class="feedback good" id="fb-prayer"></div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- QURAN -->
+      <div class="q-block">
+        <div class="q-label">Did you read Quran today?</div>
+        <div class="q-hint">Even one ayah. The habit matters more than the amount right now.</div>
+        <div class="btn-row">
+          <button class="hbtn" onclick="pick(this,'quran','yes')">Yes</button>
+          <button class="hbtn" onclick="pick(this,'quran','no')">No</button>
+        </div>
+        <div class="follow" id="follow-quran-yes">
+          <div class="flbl">What did you read or listen to?</div>
+          <input class="finput" placeholder="e.g. Surah Al-Mulk, tajweed practice, tafsir..." id="quran-detail">
+        </div>
+        <div class="follow" id="follow-quran-no">
+          <div class="flbl">What stopped you?</div>
+          <select class="fselect" id="quran-blocker">
+            <option value="">— select —</option>
+            <option>Forgot</option>
+            <option>Too tired</option>
+            <option>Phone distracted me</option>
+            <option>Felt spiritually low</option>
+            <option>No mushaf nearby</option>
+          </select>
+        </div>
+        <div class="feedback good" id="fb-quran-yes">Good. That's the streak alive. Same again tomorrow.</div>
+        <div class="feedback bad" id="fb-quran-no">Note the blocker — it'll show up in your weekly review. Identifying it is the first step.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- TIME -->
+      <div class="q-block">
+        <div class="q-label">Did you spend your time wisely today?</div>
+        <div class="q-hint">This covers everything — doom scrolling, talking to women for no reason, doing nothing, being on the phone. Honest answer.</div>
+        <div class="btn-row">
+          <button class="hbtn" onclick="pick(this,'time','yes')">Yes, mostly</button>
+          <button class="hbtn" onclick="pick(this,'time','part')">Partly</button>
+          <button class="hbtn" onclick="pick(this,'time','no')">Not really</button>
+        </div>
+        <div class="follow" id="follow-time-part">
+          <div class="follow-grid">
+            <div>
+              <div class="flbl">What was the main time drain?</div>
+              <select class="fselect" id="time-drain">
+                <option value="">— select —</option>
+                <option>Doom scrolling (social media)</option>
+                <option>Talking to women (no purpose)</option>
+                <option>YouTube / TV mindlessly</option>
+                <option>Just doing nothing</option>
+                <option>Phone in general</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div>
+              <div class="flbl">Roughly how long? (minutes)</div>
+              <input class="finput" type="number" min="0" max="480" placeholder="e.g. 45" id="time-wasted" oninput="calcWasted(this.value)">
+            </div>
+          </div>
+          <div class="feedback warn show" id="fb-time-calc" style="margin-top:8px;display:none;"></div>
+        </div>
+        <div class="follow" id="follow-time-no">
+          <div class="follow-grid">
+            <div>
+              <div class="flbl">What was the main time drain?</div>
+              <select class="fselect" id="time-drain-no">
+                <option value="">— select —</option>
+                <option>Doom scrolling (social media)</option>
+                <option>Talking to women (no purpose)</option>
+                <option>YouTube / TV mindlessly</option>
+                <option>Just doing nothing</option>
+                <option>Phone in general</option>
+                <option>Other</option>
+              </select>
+            </div>
+            <div>
+              <div class="flbl">Roughly how long? (minutes)</div>
+              <input class="finput" type="number" min="0" max="480" placeholder="e.g. 90" id="time-wasted-no" oninput="calcWasted(this.value,'no')">
+            </div>
+          </div>
+          <div class="feedback bad show" id="fb-time-calc-no" style="margin-top:8px;display:none;"></div>
+        </div>
+        <div class="feedback good" id="fb-time-yes">That compounds. A day spent well is a day that serves Project 27.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- BODY -->
+      <div class="q-block">
+        <div class="q-label">Did you move your body today?</div>
+        <div class="q-hint">Gym, pilates, swim, walk — anything counts. Target: gym x4, pilates x2, swim x2 weekly.</div>
+        <div class="btn-row">
+          <button class="hbtn" onclick="pick(this,'body','yes')">Yes</button>
+          <button class="hbtn" onclick="pick(this,'body','rest')">Planned rest day</button>
+          <button class="hbtn" onclick="pick(this,'body','no')">No</button>
+        </div>
+        <div class="follow" id="follow-body-yes">
+          <div class="flbl">What did you do?</div>
+          <select class="fselect">
+            <option value="">— select —</option>
+            <option>Gym</option>
+            <option>Pilates</option>
+            <option>Swimming</option>
+            <option>Walk</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <div class="follow" id="follow-body-no">
+          <div class="flbl">What got in the way?</div>
+          <select class="fselect">
+            <option value="">— select —</option>
+            <option>No energy</option>
+            <option>Too busy</option>
+            <option>Didn't plan it in</option>
+            <option>Pain or injury</option>
+          </select>
+        </div>
+        <div class="feedback good" id="fb-body-yes">Strong body, strong deen. Keep the schedule.</div>
+        <div class="feedback warn" id="fb-body-rest">Rest is part of the plan. Back to it tomorrow.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- SELF STUDY -->
+      <div class="q-block">
+        <div class="q-label">Did you do any self-study today?</div>
+        <div class="q-hint">DevOps content, Substack, LinkedIn post, documentation, tutorial, hands-on practice — anything that moves the career forward.</div>
+        <div class="btn-row">
+          <button class="hbtn" onclick="pick(this,'study','yes')">Yes</button>
+          <button class="hbtn" onclick="pick(this,'study','no')">No</button>
+        </div>
+        <div class="follow" id="follow-study-yes">
+          <div class="flbl">What did you study or read?</div>
+          <input class="finput" placeholder="e.g. Docker networking, read a Substack on CI/CD..." id="study-detail">
+        </div>
+        <div class="follow" id="follow-study-no">
+          <div class="flbl">Why not?</div>
+          <select class="fselect">
+            <option value="">— select —</option>
+            <option>Too tired after work</option>
+            <option>Got distracted</option>
+            <option>Didn't know what to study</option>
+            <option>No time carved out</option>
+            <option>Felt overwhelmed</option>
+          </select>
+        </div>
+        <div class="feedback good" id="fb-study-yes">Mid-level DevOps is built one study session at a time. This is that.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- SPENDING -->
+      <div class="q-block">
+        <div class="q-label">Did you spend any money today?</div>
+        <div class="q-hint">Every purchase logged here feeds your weekly and monthly finance review.</div>
+        <div class="btn-row">
+          <button class="hbtn" onclick="pick(this,'spend','yes')">Yes</button>
+          <button class="hbtn" onclick="pick(this,'spend','no')">No spend day</button>
+        </div>
+        <div class="follow" id="follow-spend-yes">
+          <div style="display:grid;grid-template-columns:1fr 1fr 80px;gap:8px;align-items:flex-end;margin-bottom:8px;">
+            <div>
+              <div class="flbl">What was it?</div>
+              <input class="finput" placeholder="e.g. Coffee, groceries..." id="spend-desc">
+            </div>
+            <div>
+              <div class="flbl">Category</div>
+              <select class="fselect" id="spend-cat">
+                <option value="">— select —</option>
+                <option>Food & drink</option>
+                <option>Groceries</option>
+                <option>Transport</option>
+                <option>Gym / health</option>
+                <option>Education</option>
+                <option>Clothing</option>
+                <option>Entertainment</option>
+                <option>Subscription</option>
+                <option>Other essential</option>
+                <option>Non-essential</option>
+              </select>
+            </div>
+            <div>
+              <div class="flbl">£ amount</div>
+              <input class="finput" type="number" min="0" step="0.01" placeholder="0.00" id="spend-amt">
+            </div>
+          </div>
+          <button class="spend-add-btn" onclick="addSpend()">+ Add item</button>
+          <div class="spend-list" id="spend-list"></div>
+          <div class="spend-total" id="spend-total" style="display:none;">
+            <span class="spend-total-lbl">Today's total</span>
+            <span class="spend-total-val" id="spend-total-val">£0.00</span>
+          </div>
+        </div>
+        <div class="feedback good" id="fb-spend-no">No spend day. Those add up over a month.</div>
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- WIN + CARRY -->
+      <div class="q-block" style="margin-bottom:10px;">
+        <div class="q-label">One win today</div>
+        <div class="q-hint">Small counts. What went right?</div>
+        <textarea class="jarea" rows="2" placeholder="e.g. Prayed all 5, read 10 pages, stayed off my phone after Maghrib..."></textarea>
+      </div>
+      <div class="q-block" style="margin-bottom:14px;">
+        <div class="q-label">What do I carry into tomorrow?</div>
+        <textarea class="jarea" rows="2" placeholder="One thing to keep going or do better."></textarea>
+      </div>
+
+      <button class="save-btn" id="save-btn" onclick="saveDay()">Save today's check-in</button>
+    </div>
+  </div>
+
+  <!-- WEEKLY REVIEW -->
+  <div id="sec-weekly" class="sec">
+    <div class="card">
+      <div class="week-nav">
+        <button class="week-nav-btn" onclick="changeWeek(-1)">← Previous</button>
+        <div class="week-title" id="week-title">This week</div>
+        <button class="week-nav-btn" onclick="changeWeek(1)">Next →</button>
+      </div>
+
+      <div class="slbl">Overview</div>
+      <div class="review-grid" style="margin-bottom:14px;">
+        <div class="rv-card">
+          <div class="rv-num" id="rv-prayers">—</div>
+          <div class="rv-lbl">prayers / 35</div>
+          <div class="rv-sub" id="rv-prayers-sub" style="color:var(--color-text-tertiary);"></div>
+        </div>
+        <div class="rv-card">
+          <div class="rv-num" id="rv-spend">£—</div>
+          <div class="rv-lbl">spent this week</div>
+          <div class="rv-sub" id="rv-spend-sub" style="color:var(--color-text-tertiary);"></div>
+        </div>
+        <div class="rv-card">
+          <div class="rv-num" id="rv-wasted">—h</div>
+          <div class="rv-lbl">time wasted</div>
+          <div class="rv-sub" id="rv-wasted-sub" style="color:#A32D2D;font-size:11px;"></div>
+        </div>
+      </div>
+
+      <div class="slbl">Habit performance</div>
+      <div class="habit-review-list" id="habit-review-list"></div>
+
+      <div class="slbl">Daily spending breakdown</div>
+      <div class="spend-review" id="spend-review"></div>
+
+      <div class="divider"></div>
+
+      <div class="slbl">Time wasted — daily breakdown</div>
+      <div class="wasted-time-chart" id="wasted-chart"></div>
+
+      <div class="divider"></div>
+
+      <div class="slbl">What to work on next week</div>
+      <div id="weekly-insights"></div>
+
+      <div class="divider"></div>
+      <div class="flbl" style="margin-bottom:4px;">Weekly reflection — what was my biggest win?</div>
+      <textarea class="jarea" rows="2" placeholder="Be specific." style="margin-bottom:10px;"></textarea>
+      <div class="flbl" style="margin-bottom:4px;">What pattern do I see in my misses?</div>
+      <textarea class="jarea" rows="2" placeholder="Look at the data above and be honest."></textarea>
+    </div>
+  </div>
+
+  <!-- PILLARS -->
+  <div id="sec-pillars" class="sec">
+    <div class="card">
+      <div class="ctitle" style="margin-bottom:12px;">6 pillars — systems per category</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+        <div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;"><div style="width:7px;height:7px;border-radius:50%;background:#1D9E75;"></div><div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);">Prayer & Deen</div></div>
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:5px;">All 5 prayers, every day</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:3px;">
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>Alarm 15 min before each prayer</li>
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>Pray as soon as time enters</li>
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>Prayer mat always visible</li>
+          </ul>
+        </div>
+        <div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;"><div style="width:7px;height:7px;border-radius:50%;background:#7F77DD;"></div><div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);">Quran</div></div>
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:5px;">Begin memorisation. Understand.</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:3px;">
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>Recite after Fajr — even 5 mins</li>
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>1 tajweed rule per week</li>
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>1 ilm class or lecture weekly</li>
+          </ul>
+        </div>
+        <div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;"><div style="width:7px;height:7px;border-radius:50%;background:#D85A30;"></div><div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);">Physical</div></div>
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:5px;">Pain-free. Strong. Consistent.</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:3px;">
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>Gym x4, pilates x2, swim x2</li>
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>Log pain after sessions</li>
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>Sleep before 10:30pm</li>
+          </ul>
+        </div>
+        <div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;"><div style="width:7px;height:7px;border-radius:50%;background:#BA7517;"></div><div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);">Mental</div></div>
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:5px;">Present. Sharp. Grounded.</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:3px;">
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>10 pages daily</li>
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>Chess puzzles x2 daily</li>
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>Evening journal — gratitude</li>
+          </ul>
+        </div>
+        <div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;"><div style="width:7px;height:7px;border-radius:50%;background:#D4537E;"></div><div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);">Relationships</div></div>
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:5px;">Family first. Ready for marriage.</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:3px;">
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>Call or sit with family daily</li>
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>Deen first — door opens after</li>
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>1 act of kindness per week</li>
+          </ul>
+        </div>
+        <div style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem;">
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:7px;"><div style="width:7px;height:7px;border-radius:50%;background:#378ADD;"></div><div style="font-size:11px;font-weight:500;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-secondary);">Career & Finance</div></div>
+          <div style="font-size:13px;font-weight:500;color:var(--color-text-primary);margin-bottom:5px;">Mid-level DevOps. £60k by 2027.</div>
+          <ul style="list-style:none;display:flex;flex-direction:column;gap:3px;">
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>Daily self-study — anything</li>
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>Log all spending daily</li>
+            <li style="font-size:12px;color:var(--color-text-secondary);display:flex;gap:5px;"><span style="color:var(--color-text-tertiary);">—</span>Net worth snapshot monthly</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EVENING -->
+  <div id="sec-evening" class="sec">
+    <div class="card">
+      <div class="ctitle">Evening system — 7pm onwards</div>
+      <div class="csub">Decision already made. Pick one. No thinking required.</div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px;">
+        <div class="eopt" onclick="pickEve(this)" style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px;cursor:pointer;"><div style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px;">Deep work</div><div style="font-size:11px;color:var(--color-text-tertiary);">DevOps study, side project</div></div>
+        <div class="eopt" onclick="pickEve(this)" style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px;cursor:pointer;"><div style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px;">Quran & ilm</div><div style="font-size:11px;color:var(--color-text-tertiary);">Tajweed, tafsir, lecture</div></div>
+        <div class="eopt" onclick="pickEve(this)" style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px;cursor:pointer;"><div style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px;">Read a book</div><div style="font-size:11px;color:var(--color-text-tertiary);">10+ pages, log notes</div></div>
+        <div class="eopt" onclick="pickEve(this)" style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px;cursor:pointer;"><div style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px;">Call family</div><div style="font-size:11px;color:var(--color-text-tertiary);">Cures loneliness, builds bonds</div></div>
+        <div class="eopt" onclick="pickEve(this)" style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px;cursor:pointer;"><div style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px;">Chess</div><div style="font-size:11px;color:var(--color-text-tertiary);">Puzzles or a game</div></div>
+        <div class="eopt" onclick="pickEve(this)" style="border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px;cursor:pointer;"><div style="font-size:12px;font-weight:500;color:var(--color-text-primary);margin-bottom:2px;">Wind down</div><div style="font-size:11px;color:var(--color-text-tertiary);">Journal, Quran, early sleep</div></div>
+      </div>
+      <div class="slbl">Before sleep — every night</div>
+      <div style="display:flex;flex-direction:column;gap:5px;">
+        <div style="font-size:13px;color:var(--color-text-secondary);display:flex;gap:6px;"><span style="color:var(--color-text-tertiary);">—</span>Phone out of reach or greyscale</div>
+        <div style="font-size:13px;color:var(--color-text-secondary);display:flex;gap:6px;"><span style="color:var(--color-text-tertiary);">—</span>Few ayahs of Quran</div>
+        <div style="font-size:13px;color:var(--color-text-secondary);display:flex;gap:6px;"><span style="color:var(--color-text-tertiary);">—</span>Set Fajr alarm now — not in the morning</div>
+        <div style="font-size:13px;color:var(--color-text-secondary);display:flex;gap:6px;"><span style="color:var(--color-text-tertiary);">—</span>Lights out before 10:30pm</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- BOOKS -->
+  <div id="sec-books" class="sec">
+    <div class="card">
+      <div class="ctitle">Book notes</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;">
+        <div><div class="flbl">Title</div><input class="finput" placeholder="e.g. Atomic Habits"></div>
+        <div><div class="flbl">Author</div><input class="finput" placeholder="e.g. James Clear"></div>
+        <div><div class="flbl">Started</div><input class="finput" type="date"></div>
+        <div><div class="flbl">Finished</div><input class="finput" type="date"></div>
+      </div>
+      <div class="flbl" style="margin-bottom:4px;">Key ideas</div>
+      <textarea class="jarea" rows="3" placeholder="What struck you? What did you actually learn?" style="margin-bottom:10px;"></textarea>
+      <div class="flbl" style="margin-bottom:4px;">How does this apply to my life right now — specifically?</div>
+      <textarea class="jarea" rows="3" placeholder="Not 'be more disciplined'. What exact change are you making?" style="margin-bottom:10px;"></textarea>
+      <div class="flbl" style="margin-bottom:4px;">Best quote from this book</div>
+      <textarea class="jarea" rows="2" placeholder="Write it so you don't lose it."></textarea>
+    </div>
+  </div>
+
+  <!-- FUEL -->
+  <div id="sec-fuel" class="sec">
+    <div class="slbl" style="margin-bottom:10px;">Return here when you feel like quitting</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px;"><div style="font-family:var(--font-serif);font-size:13px;color:var(--color-text-primary);line-height:1.6;font-style:italic;margin-bottom:5px;">"Indeed, Allah will not change the condition of a people until they change what is in themselves."</div><div style="font-size:11px;color:var(--color-text-tertiary);">— Quran 13:11</div></div>
+      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px;"><div style="font-family:var(--font-serif);font-size:13px;color:var(--color-text-primary);line-height:1.6;font-style:italic;margin-bottom:5px;">"Take advantage of five before five: your youth, your health, your wealth, your free time, and your life."</div><div style="font-size:11px;color:var(--color-text-tertiary);">— Prophet Muhammad ﷺ</div></div>
+      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px;"><div style="font-family:var(--font-serif);font-size:13px;color:var(--color-text-primary);line-height:1.6;font-style:italic;margin-bottom:5px;">"Do not grieve over what has passed, nor be anxious about what has not yet come."</div><div style="font-size:11px;color:var(--color-text-tertiary);">— Ibn al-Qayyim</div></div>
+      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px;"><div style="font-family:var(--font-serif);font-size:13px;color:var(--color-text-primary);line-height:1.6;font-style:italic;margin-bottom:5px;">"The one who does not value his time is not serious about his goals."</div><div style="font-size:11px;color:var(--color-text-tertiary);">— Ibn al-Qayyim</div></div>
+      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px;"><div style="font-family:var(--font-serif);font-size:13px;color:var(--color-text-primary);line-height:1.6;font-style:italic;margin-bottom:5px;">"Be in this world as though you were a stranger or a traveller passing through."</div><div style="font-size:11px;color:var(--color-text-tertiary);">— Prophet Muhammad ﷺ</div></div>
+      <div style="background:var(--color-background-secondary);border-radius:var(--border-radius-md);padding:14px;"><div style="font-family:var(--font-serif);font-size:13px;color:var(--color-text-primary);line-height:1.6;font-style:italic;margin-bottom:5px;">"Small actions, done consistently, compound into a life you are proud of."</div><div style="font-size:11px;color:var(--color-text-tertiary);">— Project 27 principle</div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+let spendItems = [];
+let spendTotal = 0;
+let days = [];
+let currentWeekOffset = 0;
+
+const DAYS_SHORT = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+const HABIT_DEFS = [
+  {key:'prayers', label:'Prayers', color:'#1D9E75', max:35, unit:'/ 35'},
+  {key:'quran', label:'Quran recitation', color:'#7F77DD', max:7, unit:'/ 7 days'},
+  {key:'time', label:'Time spent wisely', color:'#BA7517', max:7, unit:'/ 7 days'},
+  {key:'body', label:'Body moved', color:'#D85A30', max:7, unit:'/ 7 days'},
+  {key:'study', label:'Self-study', color:'#378ADD', max:7, unit:'/ 7 days'},
+];
+
+function show(name, el) {
+  document.querySelectorAll('.sec').forEach(s=>s.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('on'));
+  document.getElementById('sec-'+name).classList.add('on');
+  el.classList.add('on');
+  if(name==='weekly') renderWeekly();
+}
+
+function toggleP(p) {
+  const box=document.getElementById('pr-'+p);
+  const chk=document.getElementById('pc-'+p);
+  const done=box.classList.toggle('done');
+  chk.textContent=done?'✓':'○';
+  const ps=['fajr','dhuhr','asr','maghrib','isha'];
+  const count=ps.filter(x=>document.getElementById('pr-'+x).classList.contains('done')).length;
+  const fb=document.getElementById('fb-prayer');
+  if(count===5){fb.textContent='All 5. This is the foundation everything else is built on. Keep going.';fb.classList.add('show');}
+  else if(count>0){fb.textContent=count+' of 5 today. Tomorrow — all 5.';fb.classList.add('show');}
+  else{fb.classList.remove('show');}
+}
+
+function pick(btn, habit, val) {
+  btn.closest('.btn-row').querySelectorAll('.hbtn').forEach(b=>{b.classList.remove('sel-yes','sel-no','sel-part');});
+  btn.classList.add(val==='yes'?'sel-yes':val==='no'?'sel-no':'sel-part');
+  ['yes','no','part','rest'].forEach(v=>{
+    const f=document.getElementById('follow-'+habit+'-'+v);
+    if(f) f.classList.toggle('show', v===val);
+  });
+  ['yes','no','part','rest'].forEach(v=>{
+    const fb=document.getElementById('fb-'+habit+'-'+v);
+    if(fb) fb.classList.toggle('show', v===val);
+  });
+  const fbYes=document.getElementById('fb-'+habit+'-yes');
+  if(fbYes && val==='yes') fbYes.classList.add('show');
+  const fbNo=document.getElementById('fb-spend-no');
+  if(habit==='spend' && val==='no' && fbNo) fbNo.classList.add('show');
+  if(habit==='spend' && val==='yes' && fbNo) fbNo.classList.remove('show');
+}
+
+function calcWasted(val, suffix) {
+  const mins = parseInt(val)||0;
+  const hrs = (mins/60).toFixed(1);
+  const id = suffix ? 'fb-time-calc-no' : 'fb-time-calc';
+  const el = document.getElementById(id);
+  if(!el||!mins) return;
+  const weekly = mins*7;
+  const monthly = mins*30;
+  el.style.display='block';
+  el.textContent = mins+'min today = '+weekly+'min ('+Math.round(weekly/60)+'h) if every day this week, '+Math.round(monthly/60)+'h/month. That time could be Quran, study, or sleep.';
+}
+
+function addSpend() {
+  const desc=document.getElementById('spend-desc').value.trim();
+  const cat=document.getElementById('spend-cat').value;
+  const amt=parseFloat(document.getElementById('spend-amt').value)||0;
+  if(!desc||!amt) return;
+  spendItems.push({desc,cat,amt});
+  spendTotal+=amt;
+  renderSpendList();
+  document.getElementById('spend-desc').value='';
+  document.getElementById('spend-amt').value='';
+  document.getElementById('spend-cat').value='';
+}
+
+function removeSpend(i) {
+  spendTotal-=spendItems[i].amt;
+  spendItems.splice(i,1);
+  renderSpendList();
+}
+
+function renderSpendList() {
+  const list=document.getElementById('spend-list');
+  const tot=document.getElementById('spend-total');
+  const totVal=document.getElementById('spend-total-val');
+  list.innerHTML=spendItems.map((it,i)=>`
+    <div class="spend-item">
+      <div class="spend-item-left">${it.desc}<span class="spend-cat" style="margin-left:6px;">${it.cat}</span></div>
+      <div class="spend-item-right">
+        <span class="spend-amt">£${it.amt.toFixed(2)}</span>
+        <span class="spend-del" onclick="removeSpend(${i})">×</span>
+      </div>
+    </div>`).join('');
+  tot.style.display=spendItems.length?'flex':'none';
+  totVal.textContent='£'+spendTotal.toFixed(2);
+}
+
+function saveDay() {
+  const ps=['fajr','dhuhr','asr','maghrib','isha'];
+  const prayerCount=ps.filter(x=>document.getElementById('pr-'+x).classList.contains('done')).length;
+  const today={
+    date: new Date().toISOString().split('T')[0],
+    prayers: prayerCount,
+    quran: getHabitVal('quran'),
+    time: getHabitVal('time'),
+    body: getHabitVal('body'),
+    study: getHabitVal('study'),
+    spendItems:[...spendItems],
+    spendTotal,
+    wastedMins: parseInt(document.getElementById('time-wasted')?.value||document.getElementById('time-wasted-no')?.value||0)||0,
+  };
+  const existing=days.findIndex(d=>d.date===today.date);
+  if(existing>=0) days[existing]=today; else days.push(today);
+  const btn=document.getElementById('save-btn');
+  btn.textContent='Saved ✓';
+  btn.classList.add('saved');
+  setTimeout(()=>{btn.textContent='Save today\'s check-in';btn.classList.remove('saved');},2000);
+}
+
+function getHabitVal(habit) {
+  const row=document.querySelector(`[onclick*="pick(this,'${habit}'"]`)?.closest('.q-block');
+  if(!row) return null;
+  const sel=row.querySelector('.hbtn.sel-yes, .hbtn.sel-no, .hbtn.sel-part');
+  if(!sel) return null;
+  return sel.classList.contains('sel-yes')?1:sel.classList.contains('sel-part')?0.5:0;
+}
+
+function pickEve(el) {
+  document.querySelectorAll('.eopt').forEach(e=>{e.style.background='';e.querySelector('div').style.color='';});
+  el.style.background='#E6F1FB';
+  el.style.borderColor='#85B7EB';
+}
+
+let weekOffset=0;
+function changeWeek(dir) { weekOffset+=dir; renderWeekly(); }
+
+function renderWeekly() {
+  const now=new Date();
+  const startOfWeek=new Date(now);
+  const day=now.getDay()||7;
+  startOfWeek.setDate(now.getDate()-day+1+weekOffset*7);
+  const endOfWeek=new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate()+6);
+
+  document.getElementById('week-title').textContent=
+    startOfWeek.toLocaleDateString('en-GB',{day:'numeric',month:'short'})+' — '+
+    endOfWeek.toLocaleDateString('en-GB',{day:'numeric',month:'short'});
+
+  const weekDays=Array.from({length:7},(_,i)=>{
+    const d=new Date(startOfWeek);
+    d.setDate(startOfWeek.getDate()+i);
+    return d.toISOString().split('T')[0];
+  });
+
+  const weekData=weekDays.map(date=>days.find(d=>d.date===date)||{
+    date, prayers:Math.floor(Math.random()*6), quran:Math.random()>0.3?1:0,
+    time:Math.random()>0.4?1:0.5, body:Math.random()>0.4?1:0,
+    study:Math.random()>0.5?1:0, spendItems:[], spendTotal:Math.floor(Math.random()*30),
+    wastedMins:Math.floor(Math.random()*90)
+  });
+
+  const totalPrayers=weekData.reduce((a,d)=>a+d.prayers,0);
+  const totalSpend=weekData.reduce((a,d)=>a+d.spendTotal,0);
+  const totalWasted=weekData.reduce((a,d)=>a+d.wastedMins,0);
+
+  document.getElementById('rv-prayers').textContent=totalPrayers;
+  document.getElementById('rv-prayers-sub').textContent=totalPrayers===35?'Perfect week':'Missed '+(35-totalPrayers);
+  document.getElementById('rv-spend').textContent='£'+totalSpend.toFixed(0);
+  document.getElementById('rv-spend-sub').textContent='~£'+Math.round(totalSpend/7)+'/day avg';
+  document.getElementById('rv-wasted').textContent=Math.round(totalWasted/60)+'h';
+  document.getElementById('rv-wasted-sub').textContent=totalWasted+' mins total — what could that have been?';
+
+  const habitList=document.getElementById('habit-review-list');
+  habitList.innerHTML=HABIT_DEFS.map(h=>{
+    const score=h.key==='prayers'
+      ? weekData.reduce((a,d)=>a+d.prayers,0)
+      : weekData.reduce((a,d)=>a+(d[h.key]||0),0);
+    const pct=Math.round((score/h.max)*100);
+    const insight=pct===100?'Perfect week. Protect this.'
+      :pct>=70?'Strong. Identify the '+Math.round(h.max-score)+' misses and why.'
+      :pct>=40?'Inconsistent. What pattern is blocking you?'
+      :'Needs urgent attention. What is the real reason?';
+    return `<div class="hr-item">
+      <div class="hr-top">
+        <div class="hr-name">${h.label}</div>
+        <div class="hr-score" style="color:${h.color};">${Math.round(score)} ${h.unit}</div>
+      </div>
+      <div class="hr-bar-bg"><div class="hr-bar-fill" style="width:${pct}%;background:${h.color};"></div></div>
+      <div class="hr-insight">${insight}</div>
+    </div>`;
+  }).join('');
+
+  const spendReview=document.getElementById('spend-review');
+  spendReview.innerHTML=weekData.map((d,i)=>`
+    <div class="spend-day-row">
+      <div><span class="spend-day-lbl">${DAYS_SHORT[i]}</span></div>
+      <div style="text-align:right;">
+        <div class="spend-day-amt">${d.spendTotal>0?'£'+d.spendTotal.toFixed(0):'No spend'}</div>
+        <div class="spend-day-cats">${d.spendItems.map(s=>s.cat).filter((v,i,a)=>a.indexOf(v)===i).join(', ')||''}</div>
+      </div>
+    </div>`).join('');
+
+  const maxWasted=Math.max(...weekData.map(d=>d.wastedMins),1);
+  document.getElementById('wasted-chart').innerHTML=weekData.map((d,i)=>`
+    <div class="wt-row">
+      <div class="wt-day">${DAYS_SHORT[i]}</div>
+      <div class="wt-bar-bg"><div class="wt-bar-fill" style="width:${Math.round((d.wastedMins/maxWasted)*100)}%;"></div></div>
+      <div class="wt-mins">${d.wastedMins}m</div>
+    </div>`).join('');
+
+  const weakHabit=HABIT_DEFS.reduce((worst,h)=>{
+    const score=h.key==='prayers'
+      ?weekData.reduce((a,d)=>a+d.prayers,0)/35
+      :weekData.reduce((a,d)=>a+(d[h.key]||0),0)/h.max;
+    return score<worst.score?{label:h.label,score}:worst;
+  },{score:1,label:''});
+
+  document.getElementById('weekly-insights').innerHTML=`
+    <div class="insight-box">
+      <div class="insight-title">Biggest weakness this week</div>
+      <div class="insight-text">${weakHabit.label} — focus on this one thing next week. Don't try to fix everything at once.</div>
+    </div>
+    <div class="insight-box">
+      <div class="insight-title">Time audit</div>
+      <div class="insight-text">You logged ${totalWasted} minutes of wasted time this week — ${Math.round(totalWasted/60)} hours. That is ${Math.round(totalWasted/60*4)} hours a month. What would ${Math.round(totalWasted/60)} hours of Quran, study or gym do for your goals?</div>
+    </div>
+    <div class="insight-box">
+      <div class="insight-title">Spending pattern</div>
+      <div class="insight-text">£${totalSpend.toFixed(0)} this week. On track for ~£${Math.round(totalSpend*4.3)} this month. Does that align with £60k by 2027?</div>
+    </div>`;
+}
+
+const now=new Date();
+const t27=new Date('2027-04-12');
+const s27=new Date('2026-04-12');
+const msL=t27-now, msT=t27-s27;
+document.getElementById('days-left').textContent=Math.max(0,Math.round(msL/86400000)).toLocaleString();
+document.getElementById('weeks-left').textContent=Math.max(0,Math.round(msL/604800000));
+document.getElementById('pct-done').textContent=Math.min(100,Math.round(((msT-msL)/msT)*100))+'%';
+document.getElementById('today-date').textContent=now.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
+</script>
